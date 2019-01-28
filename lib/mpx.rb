@@ -1,6 +1,5 @@
 require "mpx/version"
+require "mpx/cli"
+require "mpx/multiplexer"
 
-module Mpx
-  class Error < StandardError; end
-  # Your code goes here...
-end
+Mpx::Cli.start
