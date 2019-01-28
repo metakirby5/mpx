@@ -1,5 +1,10 @@
 require 'slop'
 
+require 'mpx/alias'
+require 'mpx/command'
+require 'mpx/multiplexer'
+require 'mpx/history_writer'
+
 Usage = <<-EOF
 A command multiplexer.
 
@@ -14,26 +19,39 @@ The following subfolders are used:
             command execution.
 - `sets`    Aliases to sets of commands. Each file is an alias,
             containing newline-delimited commands to run.
-- `history` Newline-delimited history of each command.
+- `history` Newline-delimited history of each command/alias, with timestamp.
 
-The first argument is mandatory, and should be a directive in the form of
-`<COMMAND/ALIAS>:<SUBCOMMAND>` or `:<SUBCOMMAND>`.
+The first argument is mandatory, and should be one of:
 
-In the first form, `<COMMAND/ALIAS>` will be taken as the command or alias
-to run with. If names clash, aliases will take precedence over commands.
-For a given alias, the program will run all commands in the alias file.
+`history`
 
-In the second form, the program will run with all commands.
+  Taking each subsequent argument as a command or alias, the history of each
+  will be displayed in chronological order.
 
-In both forms, `<SUBCOMMAND>` will be passed as the first argument
-to each command. All arguments after the directive will be passed directly.
+  If no arguments are provided, the history of all commands and aliases 
+  will be displayed.
 
-If multiple commands run, they shall run in parallel,
-and outputs will be displayed upon completion.
+A directive in the form of `<COMMAND/ALIAS>:<SUBCOMMAND>` or `:<SUBCOMMAND>`
+
+  In the first form, `<COMMAND/ALIAS>` will be taken as the command or alias
+  to run with. If names clash, aliases will take precedence over commands.
+  For a given alias, the program will run all commands in the alias file.
+
+  In the second form, the program will run with all commands.
+
+  In both forms, `<SUBCOMMAND>` will be passed as the first argument
+  to each command. All arguments after the directive will be passed directly.
+
+  If multiple commands run, they shall run in parallel,
+  and outputs will be displayed upon completion.
 EOF
 
 MpxRoot = 'MPX_ROOT'
 DefaultRoot = '~/.local/mpx'
+BinFolder = 'bin'
+SpacesFolder = 'spaces'
+SetsFolder = 'sets'
+HistoryFolder = 'history'
 
 module Mpx
   class Cli
