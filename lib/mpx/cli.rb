@@ -17,14 +17,14 @@ The following subfolders are used:
 - `history` Newline-delimited history of each subcommand.
 
 The first argument is mandatory, and should be a directive in the form of
-`<SUBCOMMAND/ALIAS>:<ARG>` or `:<ARG>`, where `<ARG>` is optional.
+`<SUBCOMMAND/ALIAS>:<ARG>` or `:<ARG>`.
 
 In the first form, `<SUBCOMMAND/ALIAS>` will be taken as the subcommand or
 alias to run with.
 
 In the second form, the program will run with all subcommands.
 
-In both forms, `<ARG>` will be passed as the first argument if present.
+In both forms, `<ARG>` will be passed as the first argument.
 All arguments after the directive will be passed directly.
 
 If multiple subcommands run, they shall run in parallel,
@@ -76,13 +76,16 @@ module Mpx
     # Extracts `<SUBCOMMAND/ALIAS>:<ARG> <ARGS>` into {sub, args}.
     def self.parse_args(args)
       directive, *rest = args
-
       if !directive&.include? ':'
         raise ArgumentError.new 'missing directive'
       end
 
       sub, first_arg = directive.split ':', 2
-      return {sub: sub, args: [*first_arg, *rest]}
+      if first_arg.empty?
+        raise ArgumentError.new 'missing first arg'
+      end
+
+      {sub: sub.empty? ? nil : sub, args: [first_arg, *rest]}
     end
   end
 end
