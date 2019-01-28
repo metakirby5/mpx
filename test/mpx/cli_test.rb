@@ -4,63 +4,63 @@ require "mpx/cli"
 class CliTest < Minitest::Test
   [
     {
-      name: 'single_subcommand',
+      name: 'single_command',
       input: %w(py:deps),
-      sub: 'py',
+      cmd: 'py',
       args: %w(deps)
     },
     {
-      name: 'single_subcommand_with_args',
+      name: 'single_command_with_args',
       input: %w(py:install zenbu),
-      sub: 'py',
+      cmd: 'py',
       args: %w(install zenbu)
     },
     {
-      name: 'no_subcommand',
+      name: 'no_command',
       input: %w(:deps),
-      sub: nil,
+      cmd: nil,
       args: %w(deps)
     },
     {
-      name: 'no_subcommand_with_args',
+      name: 'no_command_with_args',
       input: %w(:install zenbu),
-      sub: nil,
+      cmd: nil,
       args: %w(install zenbu)
     },
     {
       name: 'just_two_colons',
       input: %w(::),
-      sub: nil,
+      cmd: nil,
       args: %w(:)
     },
     {
       name: 'colons_1',
       input: %w(a:b:c :d:),
-      sub: 'a',
+      cmd: 'a',
       args: %w(b:c :d:)
     },
     {
       name: 'colons_2',
       input: %w(::a b:),
-      sub: nil,
+      cmd: nil,
       args: %w(:a b:)
     },
     {
       name: 'colons_3',
       input: %w(a:: b:),
-      sub: 'a',
+      cmd: 'a',
       args: %w(: b:)
     },
   ].each do |c|
     define_method("test_parses_#{c[:name]}") do
-      sub, args = Mpx::Cli
+      cmd, args = Mpx::Cli
         .parse_args(c[:input])
-        .values_at(:sub, :args)
+        .values_at(:cmd, :args)
 
-      if c[:sub]
-        assert_equal c[:sub], sub
+      if c[:cmd]
+        assert_equal c[:cmd], cmd
       else
-        assert_nil c[:sub]
+        assert_nil c[:cmd]
       end
 
       assert_equal c[:args], args

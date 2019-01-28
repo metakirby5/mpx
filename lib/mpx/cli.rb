@@ -7,29 +7,32 @@ The root folder MPX_ROOT is an environment variable
 which defaults to `~/.local/mpx`.
 
 The following subfolders are used:
-- `bin`     Where subcommands are stored.
-- `spaces`  Namespaces for each subcommand.
-            Each subcommand receives a subfolder with its name in `spaces`.
+- `bin`     Where commands are stored.
+- `spaces`  Namespaces for each command.
+            Each command receives a subfolder with its name in `spaces`.
             The working directory will be changed to this subfolder before
-            subcommand execution.
-- `sets`    Aliases to sets of subcommands. Each file is an alias,
-            containing newline-delimited subcommands to run.
-- `history` Newline-delimited history of each subcommand.
+            command execution.
+- `sets`    Aliases to sets of commands. Each file is an alias,
+            containing newline-delimited commands to run.
+- `history` Newline-delimited history of each command.
 
 The first argument is mandatory, and should be a directive in the form of
-`<SUBCOMMAND/ALIAS>:<ARG>` or `:<ARG>`.
+`<COMMAND/ALIAS>:<ARG>` or `:<ARG>`.
 
-In the first form, `<SUBCOMMAND/ALIAS>` will be taken as the subcommand or
-alias to run with.
+In the first form, `<COMMAND/ALIAS>` will be taken as the command or alias
+to run with.
 
-In the second form, the program will run with all subcommands.
+In the second form, the program will run with all commands.
 
 In both forms, `<ARG>` will be passed as the first argument.
 All arguments after the directive will be passed directly.
 
-If multiple subcommands run, they shall run in parallel,
+If multiple commands run, they shall run in parallel,
 and outputs will be displayed upon completion.
 EOF
+
+MpxRoot = 'MPX_ROOT'
+DefaultRoot = '~/.local/mpx'
 
 module Mpx
   class Cli
@@ -37,18 +40,24 @@ module Mpx
       begin
         parser = Slop::Parser.new self.opts
         result = parser.parse ARGV
-        sub, args = self
+        cmd, args = self
           .parse_args(result.args)
-          .values_at(:sub, :args)
+          .values_at(:cmd, :args)
       rescue => e
         puts "Error: #{e}"
         puts
         puts self.opts
         exit 1
       else
-        puts "sub: #{sub}"
+        root = ENV.fetch(MpxRoot, DefaultRoot)
+
+        puts "root: #{root}"
+        puts "cmd: #{cmd}"
         puts "args: #{args}"
+
+        # TODO: fetch subcommands
         # TODO: multiplex
+        # TODO: log to history
       end
     end
 
@@ -73,19 +82,19 @@ module Mpx
     end
 
     ##
-    # Extracts `<SUBCOMMAND/ALIAS>:<ARG> <ARGS>` into {sub, args}.
+    # Extracts `<SUBCOMMAND/ALIAS>:<ARG> <ARGS>` into {cmd, args}.
     def self.parse_args(args)
       directive, *rest = args
       if !directive&.include? ':'
         raise ArgumentError.new 'missing directive'
       end
 
-      sub, first_arg = directive.split ':', 2
+      cmd, first_arg = directive.split ':', 2
       if first_arg.empty?
         raise ArgumentError.new 'missing first arg'
       end
 
-      {sub: sub.empty? ? nil : sub, args: [first_arg, *rest]}
+      {cmd: cmd.empty? ? nil : cmd, args: [first_arg, *rest]}
     end
   end
 end
