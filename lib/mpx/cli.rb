@@ -38,7 +38,7 @@ module Mpx
         parser = Slop::Parser.new self.opts
         result = parser.parse ARGV
         sub, args = self
-          .parse_args(result.arguments)
+          .parse_args(result.args)
           .values_at(:sub, :args)
       rescue => e
         puts "Error: #{e}"
