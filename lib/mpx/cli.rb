@@ -17,15 +17,16 @@ The following subfolders are used:
 - `history` Newline-delimited history of each command.
 
 The first argument is mandatory, and should be a directive in the form of
-`<COMMAND/ALIAS>:<ARG>` or `:<ARG>`.
+`<COMMAND/ALIAS>:<SUBCOMMAND>` or `:<SUBCOMMAND>`.
 
 In the first form, `<COMMAND/ALIAS>` will be taken as the command or alias
-to run with.
+to run with. If names clash, aliases will take precedence over commands.
+For a given alias, the program will run all commands in the alias file.
 
 In the second form, the program will run with all commands.
 
-In both forms, `<ARG>` will be passed as the first argument.
-All arguments after the directive will be passed directly.
+In both forms, `<SUBCOMMAND>` will be passed as the first argument
+to each command. All arguments after the directive will be passed directly.
 
 If multiple commands run, they shall run in parallel,
 and outputs will be displayed upon completion.
