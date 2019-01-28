@@ -44,6 +44,7 @@ module Mpx
         puts "Error: #{e}"
         puts
         puts self.opts
+        exit 1
       else
         puts "sub: #{sub}"
         puts "args: #{args}"
