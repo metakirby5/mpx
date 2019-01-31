@@ -24,11 +24,7 @@ module Mpx
 
       return [load_command(name)]
     rescue
-      begin
-        return load_set(name)
-      rescue
-        raise "no command or set found with name `#{name}`"
-      end
+      return load_set(name)
     end
 
     def load_all
@@ -52,7 +48,7 @@ module Mpx
     def load_set(set)
       set_path = File.join(@sets, set)
       if !File.exist?(set_path)
-        raise "no set found with name `#{set}`"
+        raise "no command or set found with name `#{set}`"
       end
 
       return File.foreach(set_path)
