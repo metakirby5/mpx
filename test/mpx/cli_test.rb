@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'config'
 require 'mpx/cli'
 
 describe Mpx::Cli do
