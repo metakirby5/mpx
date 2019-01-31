@@ -73,7 +73,7 @@ EOF
         self.help
         exit 1
       else
-        self.run(op, *args)
+        self.run(ARGV)
       end
     rescue => e
       puts "Error: #{e}."

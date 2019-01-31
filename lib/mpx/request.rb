@@ -10,7 +10,7 @@ module Mpx
 
       cmd, first_arg = directive.split ':', 2
       if first_arg.empty?
-        raise 'missing first arg'
+        raise 'missing subcommand'
       end
 
       @name = cmd.empty? ? nil : cmd
