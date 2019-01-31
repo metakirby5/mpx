@@ -5,7 +5,8 @@ require 'mpx/command'
 require 'mpx/multiplexer'
 require 'mpx/history_writer'
 
-Usage = <<-EOF
+module Mpx
+  Usage = <<-EOF
 A command multiplexer.
 
 The root folder MPX_ROOT is an environment variable
@@ -46,14 +47,13 @@ A directive in the form of `<COMMAND/ALIAS>:<SUBCOMMAND>` or `:<SUBCOMMAND>`
   and outputs will be displayed upon completion.
 EOF
 
-MpxRoot = 'MPX_ROOT'
-DefaultRoot = '~/.local/mpx'
-BinFolder = 'bin'
-SpacesFolder = 'spaces'
-SetsFolder = 'sets'
-HistoryFolder = 'history'
+  MpxRoot = 'MPX_ROOT'
+  DefaultRoot = '~/.local/mpx'
+  BinFolder = 'bin'
+  SpacesFolder = 'spaces'
+  SetsFolder = 'sets'
+  HistoryFolder = 'history'
 
-module Mpx
   class Cli
     def self.start()
       begin
