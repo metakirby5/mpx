@@ -1,5 +1,6 @@
 require 'mpx/request'
 require 'mpx/loader'
+require 'mpx/version'
 
 module Mpx
 
