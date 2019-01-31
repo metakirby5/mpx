@@ -1,11 +1,9 @@
-require 'slop'
-
 require 'mpx/request'
 require 'mpx/loader'
 
 module Mpx
 
-  Usage = <<-EOF
+  Help = <<-EOF
 A command multiplexer.
 
 The root folder MPX_ROOT is an environment variable
@@ -21,7 +19,15 @@ The following subfolders are used:
             containing newline-delimited commands to run.
 - `history` Newline-delimited history of each command/alias, with timestamp.
 
-The first argument is mandatory, and should be one of:
+The first argument is a mandatory operation, and should be one of:
+
+`help`
+
+  Prints this help text.
+
+`version`
+
+  Prints the version.
 
 `history`
 
@@ -49,59 +55,63 @@ EOF
   ##
   # Command line interface.
   class Cli
+    Usage = "Usage: #{$0} [operation] [args...]"
     MpxRoot = 'MPX_ROOT'
     DefaultRoot = File.join('.local', 'mpx')
 
-    def self.start()
-      begin
-        parser = Slop::Parser.new(self.opts)
-        result = parser.parse(ARGV)
-        # TODO: handle history
-
-        request = Request.new(result.args)
-        loader = Loader.new(self.root)
-        commands = loader.load(request.name).sort
-        history = loader.history
-
-        threads = commands.map do |command|
-          Thread.new do
-            result = command.run(request.args)
-            history.write(command.name, *request.args)
-            result
-          end
-        end
-
-        threads.each do |t|
-          puts t.value
-          puts
-        end
-      rescue => e
-        puts "Error: #{e}."
-        puts
-        puts self.opts
+    def self.start
+      op, * = ARGV
+      case op
+      when 'help'
+        self.help
+      when 'version'
+        self.version
+      when 'history'
+        self.history
+      when nil
+        self.help
         exit 1
       else
+        self.run(ARGV)
       end
     end
 
-    def self.opts
-      o = Slop::Options.new
+    def self.help
+      puts Help
+      puts
+      puts Usage
+    end
 
-      o.banner = 'Usage: [options] [directive] [args...]'
+    def self.version
+      puts Mpx::VERSION
+    end
 
-      o.on('-h', '--help', 'show usage') do
-        puts Usage
+    def self.history
+      puts 'TODO'
+    end
+
+    def self.run(args)
+      request = Request.new(args)
+      loader = Loader.new(self.root)
+      commands = loader.load(request.name).sort
+      history = loader.history
+
+      threads = commands.map do |command|
+        Thread.new do
+          result = command.run(request.args)
+          history.write(command.name, *request.args)
+          result
+        end
+      end
+
+      threads.each do |t|
+        puts t.value
         puts
-        puts o
-        exit
       end
-
-      o.on('-v', '--version', 'print the version') do
-        puts Mpx::VERSION
-        exit
-      end
-
-      return o
+    rescue => e
+      puts "Error: #{e}."
+      puts Usage
+      exit 1
     end
 
     def self.root
