@@ -60,20 +60,24 @@ EOF
     DefaultRoot = File.join('.local', 'mpx')
 
     def self.start
-      op, * = ARGV
+      op, *args = ARGV
       case op
       when 'help'
         self.help
       when 'version'
         self.version
       when 'history'
-        self.history
+        self.history(args)
       when nil
         self.help
         exit 1
       else
         self.run(ARGV)
       end
+    rescue => e
+      puts "Error: #{e}."
+      puts Usage
+      exit 1
     end
 
     def self.help
@@ -86,8 +90,9 @@ EOF
       puts Mpx::VERSION
     end
 
-    def self.history
-      puts 'TODO'
+    def self.history(args)
+      history = Loader.new(self.root).history
+      puts history.get(*args)
     end
 
     def self.run(args)
@@ -108,10 +113,6 @@ EOF
         puts t.value
         puts
       end
-    rescue => e
-      puts "Error: #{e}."
-      puts Usage
-      exit 1
     end
 
     def self.root
