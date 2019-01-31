@@ -1,11 +1,10 @@
 require 'slop'
 
-require 'mpx/alias'
-require 'mpx/command'
-require 'mpx/multiplexer'
-require 'mpx/history_writer'
+require 'mpx/request'
+require 'mpx/loader'
 
 module Mpx
+
   Usage = <<-EOF
 A command multiplexer.
 
@@ -18,7 +17,7 @@ The following subfolders are used:
             Each command receives a subfolder with its name in `spaces`.
             The working directory will be changed to this subfolder before
             command execution.
-- `sets`    Aliases to sets of commands. Each file is an alias,
+- `sets`    Aliases to sets of commands. Each file is a set,
             containing newline-delimited commands to run.
 - `history` Newline-delimited history of each command/alias, with timestamp.
 
@@ -26,17 +25,17 @@ The first argument is mandatory, and should be one of:
 
 `history`
 
-  Taking each subsequent argument as a command or alias, the history of each
+  Taking each subsequent argument as a command or set, the history of each
   will be displayed in chronological order.
 
-  If no arguments are provided, the history of all commands and aliases 
+  If no arguments are provided, the history of all commands and sets
   will be displayed.
 
-A directive in the form of `<COMMAND/ALIAS>:<SUBCOMMAND>` or `:<SUBCOMMAND>`
+A directive in the form of `<COMMAND/SET>:<SUBCOMMAND>` or `:<SUBCOMMAND>`
 
-  In the first form, `<COMMAND/ALIAS>` will be taken as the command or alias
-  to run with. If names clash, aliases will take precedence over commands.
-  For a given alias, the program will run all commands in the alias file.
+  In the first form, `<COMMAND/SET>` will be taken as the command or set
+  to run with. If names clash, commands will take precedence over sets.
+  For a given set, the program will run all commands in the set file.
 
   In the second form, the program will run with all commands.
 
@@ -47,36 +46,44 @@ A directive in the form of `<COMMAND/ALIAS>:<SUBCOMMAND>` or `:<SUBCOMMAND>`
   and outputs will be displayed upon completion.
 EOF
 
-  MpxRoot = 'MPX_ROOT'
-  DefaultRoot = '~/.local/mpx'
-  BinFolder = 'bin'
-  SpacesFolder = 'spaces'
-  SetsFolder = 'sets'
-  HistoryFolder = 'history'
-
+  ##
+  # Command line interface.
   class Cli
+    MpxRoot = 'MPX_ROOT'
+    DefaultRoot = File.join('.local', 'mpx')
+
     def self.start()
       begin
-        parser = Slop::Parser.new self.opts
-        result = parser.parse ARGV
-        cmd, args = self
-          .parse_args(result.args)
-          .values_at(:cmd, :args)
+        parser = Slop::Parser.new(self.opts)
+        result = parser.parse(ARGV)
+        # TODO: handle history
+
+        request = Request.new(result.args)
+        loader = Loader.new(self.root)
+        commands = loader.load(request.name).sort
+        history = loader.history
+
+        threads = commands.map do |command|
+          Thread.new do
+            result = command.run(request.args)
+            history.write(command.name, *request.args)
+            result
+          end
+        end
+
+        threads.each do |t|
+          puts t.value
+          puts
+        end
+        # TODO: fetch subcommands
+        # TODO: multiplex
+        # TODO: log to history
       rescue => e
-        puts "Error: #{e}"
+        puts "Error: #{e}."
         puts
         puts self.opts
         exit 1
       else
-        root = ENV.fetch(MpxRoot, DefaultRoot)
-
-        puts "root: #{root}"
-        puts "cmd: #{cmd}"
-        puts "args: #{args}"
-
-        # TODO: fetch subcommands
-        # TODO: multiplex
-        # TODO: log to history
       end
     end
 
@@ -85,35 +92,33 @@ EOF
 
       o.banner = 'Usage: [options] [directive] [args...]'
 
-      o.on '-h', '--help', 'show usage' do
+      o.on('-h', '--help', 'show usage') do
         puts Usage
         puts
         puts o
         exit
       end
 
-      o.on '-v', '--version', 'print the version' do
+      o.on('-v', '--version', 'print the version') do
         puts Mpx::VERSION
         exit
       end
 
-      o
+      return o
     end
 
-    ##
-    # Extracts `<SUBCOMMAND/ALIAS>:<ARG> <ARGS>` into {cmd, args}.
-    def self.parse_args(args)
-      directive, *rest = args
-      if !directive&.include? ':'
-        raise ArgumentError.new 'missing directive'
+    def self.root
+      root = ENV[MpxRoot]
+      if root
+        return root
       end
 
-      cmd, first_arg = directive.split ':', 2
-      if first_arg.empty?
-        raise ArgumentError.new 'missing first arg'
+      home = ENV['HOME']
+      if !home
+        raise "#{MpxRoot} and $HOME are both not set"
       end
 
-      {cmd: cmd.empty? ? nil : cmd, args: [first_arg, *rest]}
+      return File.join(home, DefaultRoot)
     end
   end
 end

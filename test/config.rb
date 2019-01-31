@@ -32,7 +32,7 @@ class MyReporter < Minitest::Reporters::BaseReporter
     puts "#{count - skips}/#{count} tests"
 
     color = failures.zero? && errors.zero? ? :green : :red
-    puts send(color) { "#{failures} failures" }
+    puts send(color) { "#{failures} failures, #{errors} errors" }
 
     puts
   end
