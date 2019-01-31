@@ -24,11 +24,11 @@ module Mpx
 
       return [load_command(name)]
     rescue
-
-      return load_set(name)
-    rescue
-
-      raise "no command or set found with name `#{name}`"
+      begin
+        return load_set(name)
+      rescue
+        raise "no command or set found with name `#{name}`"
+      end
     end
 
     def load_all
