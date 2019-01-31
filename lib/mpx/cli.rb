@@ -55,7 +55,7 @@ EOF
   ##
   # Command line interface.
   class Cli
-    Usage = "Usage: #{$0} [operation] [args...]"
+    Usage = "Usage: #{File.basename($0)} [operation] [args...]"
     MpxRoot = 'MPX_ROOT'
     DefaultRoot = File.join('.local', 'mpx')
 
