@@ -75,9 +75,6 @@ EOF
           puts t.value
           puts
         end
-        # TODO: fetch subcommands
-        # TODO: multiplex
-        # TODO: log to history
       rescue => e
         puts "Error: #{e}."
         puts

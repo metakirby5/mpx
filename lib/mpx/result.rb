@@ -6,17 +6,14 @@ module Mpx
   class Result
     include ANSI::Code
 
-    def initialize(out, status)
+    def initialize(name, out, status)
+      @name = name
       @out = out
       @status = status
     end
 
     def to_s
-      return [out, status_string].join("\n")
-    end
-
-    def out
-      return @out
+      return [cyan { @name }, @out.strip, status_string].join("\n")
     end
 
     def status_string

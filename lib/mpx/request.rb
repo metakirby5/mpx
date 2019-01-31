@@ -17,10 +17,6 @@ module Mpx
       @args = [first_arg, *rest]
     end
 
-    def <=>(other)
-      return @name <=> other.name
-    end
-
     def name
       return @name
     end

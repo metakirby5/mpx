@@ -12,14 +12,17 @@ module Mpx
       @working_directory = working_directory
     end
 
+    def <=>(other)
+      return self.name <=> other.name
+    end
+
     def name
       return File.basename(@bin)
     end
 
     def run(args)
-      Dir.chdir(@working_directory) {
-        return Result.new(*Open3.capture2e(@bin, *args))
-      }
+      opened = Open3.capture2e(@bin, *args, :chdir => @working_directory)
+      return Result.new(name, *opened)
     end
   end
 end
