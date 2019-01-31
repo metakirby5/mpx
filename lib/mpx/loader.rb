@@ -35,7 +35,6 @@ module Mpx
       return Dir.entries(@bin)
         .select { |f| File.file?(File.join(@bin, f)) }
         .map { |file| load_command(file) }
-        .flatten
     end
 
     def load_command(command)
@@ -58,7 +57,6 @@ module Mpx
 
       return File.foreach(set_path)
         .map { |line| load_command(line.strip) }
-        .flatten
     end
 
     def history
