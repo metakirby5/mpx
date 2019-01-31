@@ -21,7 +21,7 @@ class MyReporter < Minitest::Reporters::BaseReporter
 
     if test.failure
       puts "#{red {'FAIL'}} #{test.class_name}: #{test.name[10..-1]}"
-      puts pad_test test.failure.message
+      puts pad_test(test.failure.message)
       puts test.failure.location
       puts
     end

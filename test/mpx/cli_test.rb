@@ -7,18 +7,18 @@ describe Mpx::Cli do
       input, exp_cmd, exp_args = test_case
         .values_at(:input, :cmd, :args)
 
-      it "parses `#{input.join ' '}`" do
+      it "parses `#{input.join(' ')}`" do
         cmd, args = Mpx::Cli
           .parse_args(input)
           .values_at(:cmd, :args)
 
         if exp_cmd.nil?
-          assert_nil cmd
+          assert_nil(cmd)
         else
-          assert_equal exp_cmd, cmd
+          assert_equal(exp_cmd, cmd)
         end
 
-        assert_equal exp_args, args
+        assert_equal(exp_args, args)
       end
     end
 
@@ -68,7 +68,7 @@ describe Mpx::Cli do
 
   describe 'InvalidInput' do
     def self.it_raises_argument_error(input)
-      it "raises ArgumentError for `#{input.join ' '}`" do
+      it "raises ArgumentError for `#{input.join(' ')}`" do
         assert_raises(ArgumentError) do
           Mpx::Cli.parse_args(input)
         end
