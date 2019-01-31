@@ -14,25 +14,22 @@ module Mpx
       return DateTime.now.strftime("%d/%m/%Y %H:%M")
     end
 
-    def get(*commands)
-      lines = commands.length.zero? ? get_all : commands
-        .map { |c| get_one(c) }
-        .flatten
-
-      return lines.sort_by do |line|
-        time, * = line.split('$')
-        DateTime.parse(time.strip)
-      end
-    end
-
-    def get_all
+    def all_history
       return Dir.entries(@root)
         .select { |f| File.file?(File.join(@root, f)) }
-        .map { |file| get_one(file) }
-        .flatten
     end
 
-    def get_one(command)
+    def get(*commands)
+      return (commands.empty? ? all_history : commands)
+        .map { |c| history_for(c) }
+        .flatten
+        .sort_by do |line|
+          time, * = line.split('$')
+          DateTime.parse(time.strip)
+        end
+    end
+
+    def history_for(command)
       File.foreach(File.join(@root, command))
         .map { |line| line.strip }
     rescue
