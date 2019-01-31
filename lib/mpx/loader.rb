@@ -56,6 +56,7 @@ module Mpx
       end
 
       return File.foreach(set_path)
+        .uniq
         .map { |line| load_command(line.strip) }
     end
 
