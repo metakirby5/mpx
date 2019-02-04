@@ -4,7 +4,7 @@
 A command multiplexer.
 
 The root folder MPX_ROOT is an environment variable
-which defaults to `~/.local/mpx`.
+which defaults to `$XDG_DATA_HOME/mpx`, i.e. `~/.local/share/mpx`.
 
 The following subfolders are used:
 - `bin`     Where commands are stored.

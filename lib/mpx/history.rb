@@ -6,8 +6,6 @@ module Mpx
   class History
     def initialize(root)
       @root = root
-
-      FileUtils.mkdir_p(@root)
     end
 
     def now

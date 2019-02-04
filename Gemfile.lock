@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mpx (0.1.1)
+    mpx (0.1.2)
       ansi (~> 1.5)
 
 GEM

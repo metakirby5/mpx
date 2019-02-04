@@ -8,7 +8,7 @@ module Mpx
 A command multiplexer.
 
 The root folder MPX_ROOT is an environment variable
-which defaults to `~/.local/mpx`.
+which defaults to `$XDG_DATA_HOME/mpx`, i.e. `~/.local/share/mpx`.
 
 The following subfolders are used:
 - `bin`     Where commands are stored.
@@ -58,7 +58,7 @@ EOF
   class Cli
     Usage = "Usage: #{File.basename($0)} [operation] [args...]"
     MpxRoot = 'MPX_ROOT'
-    DefaultRoot = File.join('.local', 'mpx')
+    RootFolder = 'mpx'
 
     def self.start
       op, *args = ARGV
@@ -97,8 +97,12 @@ EOF
     end
 
     def self.run(args)
+      root = self.root
+      raise 'Unable to determine root folder' unless root
+      raise 'Root folder does not exist' unless File.directory?(root)
+
       request = Request.new(args)
-      loader = Loader.new(self.root)
+      loader = Loader.new(root)
       commands = loader.load(request.name).sort
       history = loader.history
 
@@ -118,16 +122,18 @@ EOF
 
     def self.root
       root = ENV[MpxRoot]
-      if root
-        return root
-      end
+      return root if root
+
+      data_home = self.data_home
+      return File.join(data_home, RootFolder) if data_home
+    end
+
+    def self.data_home
+      data_home = ENV['XDG_DATA_HOME']
+      return data_home if data_home
 
       home = ENV['HOME']
-      if !home
-        raise "#{MpxRoot} and $HOME are both not set"
-      end
-
-      return File.join(home, DefaultRoot)
+      return File.join(home, '.local', 'share') if home
     end
   end
 end

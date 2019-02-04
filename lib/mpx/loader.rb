@@ -14,17 +14,19 @@ module Mpx
       @bin = File.join(root, BinFolder)
       @spaces = File.join(root, SpacesFolder)
       @sets = File.join(root, SetsFolder)
-      @history = History.new(File.join(root, HistoryFolder))
+      @history = File.join(root, HistoryFolder)
+
+      FileUtils.mkdir_p(@bin)
+      FileUtils.mkdir_p(@spaces)
+      FileUtils.mkdir_p(@sets)
+      FileUtils.mkdir_p(@history)
+
+      @history_obj = History.new(@history)
     end
 
     def load(name)
-      if name.nil?
-        return load_all
-      end
-
-      return [load_command(name)]
-    rescue
-      return load_set(name)
+      return load_all if name.nil?
+      return [load_command(name)] rescue load_set(name)
     end
 
     def load_all
@@ -57,7 +59,7 @@ module Mpx
     end
 
     def history
-      @history
+      @history_obj
     end
   end
 end
