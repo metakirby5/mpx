@@ -30,6 +30,10 @@ The first argument is a mandatory operation, and should be one of:
 
   Prints the version.
 
+`list`
+
+  Prints the available commands to run.
+
 `history`
 
   Taking each subsequent argument as a command or set, the history of each
@@ -67,6 +71,8 @@ EOF
         self.help
       when 'version'
         self.version
+      when 'list'
+        self.list
       when 'history'
         self.history(args)
       when nil
@@ -91,18 +97,18 @@ EOF
       puts Mpx::VERSION
     end
 
+    def self.list
+      puts Loader.new(self.get_root).list
+    end
+
     def self.history(args)
-      history = Loader.new(self.root).history
+      history = Loader.new(self.get_root).history
       puts history.get(*args)
     end
 
     def self.run(args)
-      root = self.root
-      raise 'Unable to determine root folder' unless root
-      raise 'Root folder does not exist' unless File.directory?(root)
-
+      loader = Loader.new(self.get_root)
       request = Request.new(args)
-      loader = Loader.new(root)
       commands = loader.load(request.name).sort
       history = loader.history
 
@@ -118,6 +124,13 @@ EOF
         puts t.value
         puts
       end
+    end
+
+    def self.get_root
+      root = self.root
+      raise 'Unable to determine root folder' unless root
+      raise 'Root folder does not exist' unless File.directory?(root)
+      return root
     end
 
     def self.root

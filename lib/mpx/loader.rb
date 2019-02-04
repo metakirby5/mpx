@@ -24,15 +24,22 @@ module Mpx
       @history_obj = History.new(@history)
     end
 
+    def list
+      return Dir.entries(@bin)
+        .select { |f| File.file?(File.join(@bin, f)) }
+    end
+
+    def history
+      @history_obj
+    end
+
     def load(name)
       return load_all if name.nil?
       return [load_command(name)] rescue load_set(name)
     end
 
     def load_all
-      return Dir.entries(@bin)
-        .select { |f| File.file?(File.join(@bin, f)) }
-        .map { |file| load_command(file) }
+      return list.map { |file| load_command(file) }
     end
 
     def load_command(command)
@@ -56,10 +63,6 @@ module Mpx
       return File.foreach(set_path)
         .uniq
         .map { |line| load_command(line.strip) }
-    end
-
-    def history
-      @history_obj
     end
   end
 end
