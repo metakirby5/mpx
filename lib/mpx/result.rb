@@ -17,8 +17,10 @@ module Mpx
     end
 
     def status_string
-      color = @status.exitstatus.zero? ? :green : :red
-      return send(color) { @status }
+      status = @status.exitstatus
+      color = status.zero? ? :green : :red
+      message = status.zero? ? 'Done!' : "Exited with code #{status}."
+      return send(color) { message }
     end
   end
 end
