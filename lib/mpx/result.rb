@@ -8,12 +8,19 @@ module Mpx
 
     def initialize(name, out, status)
       @name = name
-      @out = out
+      @out = out.strip
       @status = status
     end
 
     def to_s
-      return [cyan { @name }, @out.strip, status_string].join("\n")
+      out = @out.empty? ? yellow { 'No output.' } : @out
+      return [
+        cyan { @name },
+        cyan { '-' * @name.length },
+        out,
+        '',
+        status_string
+      ].join("\n")
     end
 
     def status_string

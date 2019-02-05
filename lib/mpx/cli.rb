@@ -120,6 +120,8 @@ EOF
           history.write(command.name, *request.args)
           mut.synchronize {
             puts result
+            puts
+            puts
           }
         end
       end.map(&:join)
