@@ -122,7 +122,7 @@ EOF
             puts result
           }
         end
-      end.map(&:value)
+      end.map(&:join)
     end
 
     def self.get_root
