@@ -1,3 +1,4 @@
+require 'thread'
 require 'mpx/request'
 require 'mpx/loader'
 require 'mpx/version'
@@ -112,18 +113,16 @@ EOF
       commands = loader.load(request.name).sort
       history = loader.history
 
-      threads = commands.map do |command|
+      mut = Mutex.new
+      commands.map do |command|
         Thread.new do
           result = command.run(request.args)
           history.write(command.name, *request.args)
-          result
+          mut.synchronize {
+            puts result
+          }
         end
-      end
-
-      threads.each do |t|
-        puts t.value
-        puts
-      end
+      end.map(&:value)
     end
 
     def self.get_root
